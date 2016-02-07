@@ -1,24 +1,19 @@
 import React from 'react'
-import Navigation from './Navigation'
-import store from '../store'
 
-const Counter = ({value, onIncrement, onDecrement}) => (
-<div>
-    <h1>{value}</h1>
-    <button onClick={onIncrement}>+</button>
-    <button onClick={onDecrement}>-</button>
-  </div>
-)
+import Fieldset from './Fieldset'
+import List from './List'
+import Test from './Test'
 
 const App = React.createClass({
   render: function () {
     return (
     <div>
-        <Navigation />
-        <Counter value={store.getState()}
-    onIncrement={() => store.dispatch({ type: 'INCREMENT' })}
-    onDecrement={() => store.dispatch({ type: 'DECREMENT' })}
-    />
+        <List/>
+        <form>
+          <legend>Form</legend>
+          <Fieldset/>
+        </form>
+        <Test/>
       </div>
     )
   }

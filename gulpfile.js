@@ -6,25 +6,30 @@ var babelify = require('babelify');
 var watchify = require('watchify');
 var notify = require('gulp-notify');
 
-var autoprefixer = require('gulp-autoprefixer');
 var uglify = require('gulp-uglify');
-var rename = require('gulp-rename');
 var buffer = require('vinyl-buffer');
 
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var historyApiFallback = require('connect-history-api-fallback');
 
+var sass = require('gulp-sass');
+
+gulp.task('sass', function () {
+  return gulp.src('./styles/*.scss')
+    .pipe(sass().on('error', sass.logError))
+    .pipe(gulp.dest('./build'));
+});
+
 /*
   Browser Sync
 */
 gulp.task('browser-sync', function() {
-    browserSync({
-        // we need to disable clicks and forms for when we test multiple rooms
-        server : {},
-        middleware : [ historyApiFallback() ],
-        ghostMode: false
-    });
+  browserSync({
+    server: {},
+    middleware: [ historyApiFallback() ],
+    ghostMode: false
+  });
 });
 
 function handleErrors() {
@@ -44,7 +49,6 @@ function buildScript(file, watch) {
     transform:  [babelify.configure({stage : 0 })]
   };
 
-  // watchify() if watch requested, otherwise run browserify() once 
   var bundler = watch ? watchify(browserify(props)) : browserify(props);
 
   function rebundle() {
@@ -52,12 +56,9 @@ function buildScript(file, watch) {
     return stream
       .on('error', handleErrors)
       .pipe(source(file))
+      .pipe(buffer())
+      .pipe(uglify())
       .pipe(gulp.dest('./build/'))
-      // If you also want to uglify it
-      // .pipe(buffer())
-      // .pipe(uglify())
-      // .pipe(rename('app.min.js'))
-      // .pipe(gulp.dest('./build'))
       .pipe(reload({stream:true}))
   }
 
@@ -76,7 +77,7 @@ gulp.task('scripts', function() {
 });
 
 // run 'scripts' task first, then watch for future changes
-gulp.task('default', ['scripts','browser-sync'], function() {
-  gulp.watch('css/**/*', ['styles']); // gulp watch for stylus changes
+gulp.task('default', ['scripts','browser-sync', 'sass'], function() {
+  gulp.watch('./styles/*.scss', ['sass']);
   return buildScript('main.js', true); // browserify watch for JS changes
 });
