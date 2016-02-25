@@ -1,16 +1,25 @@
 import { createStore } from 'redux'
 
-const CounterReducer = (state = 0, action) => {
+const CounterReducer = (state = [], action) => {
   switch (action.type) {
-    case 'INCREMENT':
-      return state + 1
-    case 'DECREMENT':
-      return state - 1
+    case 'ADD_TODO':
+      return [
+        ...state,
+        {
+          id: action.id,
+          text: action.text,
+          info: [action.info]
+        }
+      ]
+    case 'SHOW_ITEM':
+      return action.item
     default:
       return state
   }
 }
 
 const store = createStore(CounterReducer)
+
+console.log(store.getState())
 
 export default store
